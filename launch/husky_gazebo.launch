@@ -1,0 +1,93 @@
+<launch>
+
+  <param name="/use_sim_time" value="true"/>
+
+  <!-- Use "g" for "gradient map" and "b" for "gradient and evident obstacles map". Better with "g" -->
+  <arg name="map" default="g" />
+  <arg name="source" default="octo" />
+  <arg name="frequency" default="loop" />
+  <arg name="dimension" default="150" />
+  <arg name="resolution" default="0.75" />
+  <arg name="meters" default="9" />
+
+  <node pkg="navigation_final_semfire_pilot" name="timestamp_changer" type="timestamp_changer.py"/>
+
+  <node pkg="navigation_final_semfire_pilot" type="francisco_txt_to_pc2.py" name="francisco_txt_to_pc2" output="screen"/>
+
+  <!-- Just to be able to move a robot along the generated paths in simulation -->
+  <include file="$(find husky_gazebo)/launch/husky_empty_world.launch"/>
+
+  <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+
+  <!-- Run a VoxelGrid filter to clean NaNs and downsample the data -->
+  <node pkg="nodelet" type="nodelet" name="voxel_grid" args="load pcl/VoxelGrid pcl_manager" output="screen">
+    <remap from="~input" to="octomap_point_cloud_centers" />
+    <remap from="~output" to="decimated_pointclouds" />
+    <rosparam>
+      filter_field_name: z
+      filter_limit_min: -100
+      filter_limit_max: 100
+      filter_limit_negative: False
+      leaf_size: 0.15
+    </rosparam>
+  </node>
+
+<!-- launch here the frame node -->
+  <node pkg="navigation_final_semfire_pilot" type="frame_changer" name="frame_changing_node" />
+
+  <!-- Filter out the points that are too far away -->
+  <node pkg="nodelet" type="nodelet" name="crop_box" args="load pcl/CropBox pcl_manager" output="screen">
+    <remap from="~input" to="decimated_pointclouds_bobcat_base" />
+    <remap from="~output" to="preProcessed_pointcloud" />
+    <rosparam>
+          min_x: -100.0
+          max_x: 100.0
+          min_y: -100.0
+          max_y: 100.0
+          min_z: -30.0
+          max_z: 30.0
+          keep_organized: false
+          negative: false
+    </rosparam>
+  </node>
+
+  <include file="$(find navigation_final_semfire_pilot)/launch/nav_stack.launch"/>
+  <!-- <include file="$(find ranger_gazebo)/launch/move_base.launch"/> -->
+
+  <!--Start rviz-->
+  <node name="rviz" type="rviz" pkg="rviz" args="-d $(find navigation_final_semfire_pilot)/rviz_config/montmorency.rviz" />
+
+  <group unless="$(eval map == 'g')">
+    <node pkg="navigation_final_semfire_pilot" type="evident_obstacle_detection.py" name="evident_obstacle_detection" output="screen" >
+      <rosparam subst_value="true">
+            map: $(arg map)
+            source: $(arg source)
+            frequency: $(arg frequency)
+            dimension: $(arg dimension)
+            resolution: $(arg resolution)
+            meters: $(arg meters)
+            evident_threshold: 3.0
+            variance_threshold: 1.0
+            mean_threshold: 1.0
+            variation_threshold: 1.5
+      </rosparam>
+    </node>
+  </group>
+
+  <node pkg="navigation_final_semfire_pilot" type="processing_node_main.py" name="processing_node_main" output="screen" >
+    <rosparam subst_value="true">
+          map: $(arg map)
+          source: $(arg source)
+          frequency: $(arg frequency)
+          dimension: $(arg dimension)
+          resolution: $(arg resolution)
+          meters: $(arg meters)
+          gradient_threshold: 0.35
+    </rosparam>
+  </node>
+  
+  <node pkg="navigation_final_semfire_pilot" type="data_fusion.py" name="data_fusion" output="screen">
+    <param name="map" value="$(arg map)"/>
+  </node>
+
+</launch> 

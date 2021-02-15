@@ -1,0 +1,19 @@
+# map_type: costmap
+# obstacle_range: 3.0
+# raytrace_range: 3.5
+# footprint: [[0.5, -0.5], [0.5, 0.5], [-0.5, 0.5], [-0.5, -0.5]]
+#robot_radius: ir_of_robot
+# inflation_radius: 0.0
+
+# plugins: 
+#   - {name: static_layer,  type: "costmap_2d::StaticLayer"}
+#   # ... other parameters
+
+# static_layer:
+#   map_topic: new_local_costmap
+#   subscribe_to_updates: true
+#   static_map: true
+
+# observation_sources: point_cloud_sensor
+
+# point_cloud_sensor: {sensor_frame: bobcat_base, data_type: PointCloud2, topic: preProcessed_pointcloud, marking: true, clearing: true}

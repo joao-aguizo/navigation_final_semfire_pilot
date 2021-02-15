@@ -1,0 +1,10 @@
+src/__pycache__/
+src/.vscode/
+plots/
+logfiles/
+*.pickle
+*.pdf
+*.prof
+*.tex
+*.world
+*.png

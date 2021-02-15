@@ -1,0 +1,14 @@
+local_costmap:
+  global_frame: map
+  robot_base_frame: bobcat_base
+  update_frequency: 2.0
+  publish_frequency: 2.0
+  transform_tolerance: 0.5
+  static_map: false
+  rolling_window: true
+  width: 20.0
+  height: 20.0
+  resolution: 0.05
+  # footprint: [[1.445,-0.88], [1.445,0.88], [-1.565,0.88], [-1.565,-0.88]] # 1.29235
+  footprint: [[2.5, -2.5], [2.5, 2.5], [-2.5, 2.5], [-2.5, -2.5]]
+  inflation_radius: 0.0
