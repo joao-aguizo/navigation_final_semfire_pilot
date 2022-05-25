@@ -5,28 +5,16 @@ global_costmap:
   publish_frequency: 1.0
   static_map: true
   rolling_window: false
-  # width: 15.0
-  # height: 15.0 
-  # resolution: 0.5
   transform_tolerance: 0.5
-  # footprint: [[1.445,-0.88], [1.445,0.88], [-1.565,0.88], [-1.565,-0.88]] # 1.29235
-  footprint: [[2.5, -2.5], [2.5, 2.5], [-2.5, 2.5], [-2.5, -2.5]]
+  footprint: [[1.445,-0.88], [1.445,0.88], [-1.565,0.88], [-1.565,-0.88]]
   inflation_radius: 0.0
 
   plugins: 
   - {name: static_layer,  type: "costmap_2d::StaticLayer"}
-  # ... other parameters
 
   static_layer:
-    # map_topic: /grid_map_visualization/elevation_grid
     map_topic: /fused_costmap
     # subscribe_to_updates: true
     static_map: true
     trinary_costmap: false # flag to switch between trinary costmap (unknown/free/occ) or full range costmap
     track_unknown_space: true # flag to decide wether unknown space is treated as free or unknown
-
-
-# static_layer:
-#     map_topic: new_local_costmap
-#     subscribe_to_updates: true
-#     # static_map: true

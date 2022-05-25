@@ -16,16 +16,16 @@ class CostmapFusion:
 
 	def get_costmaps(self, choose_map):
 		
-		if choose_map == "b":
+		if choose_map == "both":
 			self.roughness = rospy.wait_for_message('new_local_costmap', OccupancyGrid)
 			self.obstacles = rospy.wait_for_message('evident_obstacles_map', OccupancyGrid)
-			return "b"
-		elif choose_map == "g":
+			return "both"
+		elif choose_map == "roughness":
 			self.roughness = rospy.wait_for_message('new_local_costmap', OccupancyGrid)
-			return "g"
-		elif choose_map == "e":
+			return "roughness"
+		elif choose_map == "evident":
 			self.obstacles = rospy.wait_for_message('evident_obstacles_map', OccupancyGrid)
-			return "e"
+			return "evident"
 		else:
 			rospy.logerr("Data Fusion Node: Unknown map name received inside 'get_costmaps'!")
 			return None
@@ -33,7 +33,7 @@ class CostmapFusion:
 
 	def fuse_layers(self, map_type):
 
-		if map_type == "b":
+		if map_type == "both":
 
 			fused_costmap = []
 
@@ -46,11 +46,11 @@ class CostmapFusion:
 				i += 1
 			self.publish_map(fused_costmap)
 
-		elif map_type == "g":
+		elif map_type == "roughness":
 			self.roughness.data = [-1 if elem == 0 else elem for elem in self.roughness.data]
 			self.publish_map(self.roughness.data)
 
-		elif map_type == "e":
+		elif map_type == "evident":
 			self.publish_map(self.obstacles.data)
 
 		else:
@@ -91,7 +91,7 @@ class CostmapFusion:
 			map_type = self.get_costmaps(choose_map)
 			self.fuse_layers(map_type)
 			elapsed = perf_counter() - t
-			print(f"The elapsed time was: {elapsed:0.2f}.") # with f-string
+			print(f"[FUSION] The elapsed time was: {elapsed:0.2f}.") # with f-string
 			rate.sleep()
 
 
@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
 	rospy.init_node('costmap_fusion')
 
-	choose_map = rospy.get_param('~map', 'b')
+	choose_map = rospy.get_param('~fusion_type', "both")
 
 	fusion = CostmapFusion()
 	fusion.main(choose_map)

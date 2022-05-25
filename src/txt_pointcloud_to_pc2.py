@@ -13,16 +13,15 @@ class txtToPC2:
 
 		self.data = []
 		self.pc2 = PointCloud2()
-		self.pub = rospy.Publisher("test_pc2", PointCloud2, queue_size=10)
+		self.pub = rospy.Publisher("pointcloud2_map", PointCloud2, queue_size=10)
+		self.file_path = rospy.get_param('~file_path', '/media/data/Final Pilot/45_facedown_merged.txt')
 
 	def read_txt(self):
 
-		csv_reader = csv.reader(open("/media/data/Final Pilot/45_facedown_merged.txt", 'r'), delimiter=',')
+		csv_reader = csv.reader(open(self.file_path, 'r'), delimiter=',')
 		for row in csv_reader:
 			x = np.float32(row[0:3])
-			# print(x)
 			self.data.extend(list(x.view(np.uint8)))
-			# print(x.view(np.uint8))
 
 	def build_pointcloud2(self):
 
@@ -40,6 +39,7 @@ class txtToPC2:
 
 	def publish_pointcloud2(self):
 
+		self.pc2.header.stamp = rospy.Time.now()
 		self.pub.publish(self.pc2)
 			
 
@@ -53,8 +53,6 @@ class txtToPC2:
 			print("publishing")
 			self.publish_pointcloud2()
 			rate.sleep()
-		# rospy.loginfo("Received pointcloud.")
-			# self.process_pointcloud2(pointcloud)
 
 
 
@@ -65,5 +63,3 @@ if __name__ == "__main__":
 
 	pointcloud = txtToPC2()
 	pointcloud.main()
-	# print("hey")
-	# print(pointcloud.data)
