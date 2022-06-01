@@ -13,7 +13,7 @@ class txtToPC2:
 
 		self.data = []
 		self.pc2 = PointCloud2()
-		self.pub = rospy.Publisher("pointcloud2_map", PointCloud2, queue_size=10)
+		self.pub = rospy.Publisher("pointcloud2_map", PointCloud2, queue_size=10, latch=True)
 		self.file_path = rospy.get_param('~file_path', '/media/data/Final Pilot/45_facedown_merged.txt')
 
 	def read_txt(self):
@@ -45,14 +45,16 @@ class txtToPC2:
 
 	def main(self):
 
-		rate = rospy.Rate(1)
+		# rate = rospy.Rate(1)
 
 		self.read_txt()
 		self.build_pointcloud2()
+		self.publish_pointcloud2()
 		while not rospy.is_shutdown():
-			print("publishing")
-			self.publish_pointcloud2()
-			rate.sleep()
+			pass
+			# print("publishing")
+			# self.publish_pointcloud2()
+			# rate.sleep()
 
 
 

@@ -75,8 +75,8 @@ public:
 		    double roll, pitch, yaw;
 		    rotationMatrix.getRPY(roll, pitch, yaw);
 
-		    tfQuat.setRPY(0, 0, yaw);
-		    tf::Transform tf2(tfQuat, tfVec);
+		    tfQuat.setRPY(-roll, -pitch, yaw);
+		    tf::Transform tf2(tfQuat, tf::Vector3(0,0,0));
 
 		    tf::StampedTransform finalTransform(tf2, ros::Time::now(), "bobcat_base", "base_footprint");    
 			tfBroadcaster->sendTransform(finalTransform);
